@@ -289,6 +289,12 @@ body::after {
   outline: none;
   margin-top: 8px;
 }
+.volume-slider.sub {
+  width: calc(100% - 20px);
+  margin-left: 20px;
+  margin-top: 2px;
+  margin-bottom: 6px;
+}
 .volume-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 14px; height: 14px;

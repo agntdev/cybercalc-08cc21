@@ -26,27 +26,36 @@
     <div class="settings-panel" id="settingsPanel">
       <h3>Sound Settings</h3>
 
-      <div class="setting-row">
-        <label>Master Volume</label>
-      </div>
-      <input type="range" class="volume-slider" id="volumeSlider" min="0" max="1" step="0.05" value="0.5">
+      <!-- Master -->
+      <div class="setting-row"><label>Master Volume</label></div>
+      <input type="range" class="volume-slider" id="volMaster" min="0" max="1" step="0.05" data-type="master">
 
+      <!-- Click -->
       <div class="setting-row">
         <label>Keypad Clicks</label>
         <div class="toggle on" id="toggleClick" data-sound="click"></div>
       </div>
+      <input type="range" class="volume-slider sub" id="volClick" min="0" max="1" step="0.05" data-type="click">
 
+      <!-- Error -->
       <div class="setting-row">
         <label>Error Alerts</label>
         <div class="toggle on" id="toggleError" data-sound="error"></div>
       </div>
+      <input type="range" class="volume-slider sub" id="volError" min="0" max="1" step="0.05" data-type="error">
 
+      <!-- Ambient -->
       <div class="setting-row">
         <label>
           Ambient Music
           <span class="status-ambient" id="ambientStatus"></span>
         </label>
         <div class="toggle" id="toggleAmbient" data-sound="ambient"></div>
+      </div>
+      <input type="range" class="volume-slider sub" id="volAmbient" min="0" max="1" step="0.05" data-type="ambient">
+
+      <div style="margin-top:10px;text-align:center;font-size:11px;color:#6666aa">
+        settings persist automatically
       </div>
     </div>
 
@@ -103,6 +112,27 @@
     }
   });
 
+  /* ── Restore saved state ─────────────────────────────── */
+  function restoreUI() {
+    // Toggles
+    ;['click','error','ambient'].forEach(type => {
+      const el = document.querySelector(`.toggle[data-sound="${type}"]`);
+      if (sound.isEnabled(type)) el.classList.add('on');
+      else el.classList.remove('on');
+    });
+
+    // Volume sliders
+    ;['master','click','error','ambient'].forEach(type => {
+      const el = document.getElementById(`vol${type.charAt(0).toUpperCase()+type.slice(1)}`);
+      if (el) el.value = sound.getVolume(type);
+    });
+
+    // Ambient status dot
+    if (sound.isEnabled('ambient')) {
+      document.getElementById('ambientStatus').classList.add('on');
+    }
+  }
+
   /* ── Toggle switches ────────────────────────────────── */
   document.querySelectorAll('.toggle[data-sound]').forEach(el => {
     el.addEventListener('click', () => {
@@ -123,10 +153,16 @@
     });
   });
 
-  /* ── Volume ──────────────────────────────────────────── */
-  document.getElementById('volumeSlider').addEventListener('input', (e) => {
-    sound.setVolume(parseFloat(e.target.value));
+  /* ── Volume sliders ──────────────────────────────────── */
+  document.querySelectorAll('.volume-slider').forEach(el => {
+    el.addEventListener('input', () => {
+      const type = el.dataset.type;
+      sound.setVolume(type, parseFloat(el.value));
+    });
   });
+
+  /* ── Init from saved state ──────────────────────────── */
+  restoreUI();
 
   /* ── Negate button wiring ────────────────────────────── */
   document.querySelector('[data-key="±"]').addEventListener('click', () => {
