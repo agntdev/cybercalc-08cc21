@@ -2,6 +2,9 @@
 // Pure functions throw `CalculatorError` for domain/argument problems so
 // callers can surface meaningful messages instead of NaN / Infinity.
 
+export const PI = Math.PI;
+export const E = Math.E;
+
 export const ERR = Object.freeze({
   INVALID_ARGUMENT: 'INVALID_ARGUMENT',
   DIVISION_BY_ZERO: 'DIVISION_BY_ZERO',
@@ -88,6 +91,14 @@ export function abs(x) {
   return Math.abs(x);
 }
 
+export function reciprocal(x) {
+  requireFiniteNumber(x, 'x');
+  if (x === 0) {
+    throw new CalculatorError(ERR.DIVISION_BY_ZERO, 'reciprocal of zero');
+  }
+  return 1 / x;
+}
+
 // percent(part, whole) -> part as a percentage of whole, i.e. part/whole*100.
 export function percent(part, whole) {
   requireFiniteNumber(part, 'part');
@@ -162,6 +173,57 @@ export function factorial(n) {
   return result;
 }
 
+// --- combinatorics -----------------------------------------------------------
+
+// nPr = n * (n-1) * … * (n-r+1). Computed iteratively so we don't hit the
+// 170! ceiling for combinations of larger n with small r.
+export function permutations(n, r) {
+  requireInteger(n, 'n');
+  requireInteger(r, 'r');
+  if (n < 0 || r < 0) {
+    throw new CalculatorError(ERR.DOMAIN_ERROR, 'n and r must be non-negative');
+  }
+  if (r > n) {
+    throw new CalculatorError(ERR.DOMAIN_ERROR, 'r must not exceed n');
+  }
+  let result = 1;
+  for (let i = 0; i < r; i += 1) {
+    result *= n - i;
+  }
+  return guardOverflow(result);
+}
+
+// nCr = nPr / r!  computed iteratively to keep intermediate values smaller.
+export function combinations(n, r) {
+  requireInteger(n, 'n');
+  requireInteger(r, 'r');
+  if (n < 0 || r < 0) {
+    throw new CalculatorError(ERR.DOMAIN_ERROR, 'n and r must be non-negative');
+  }
+  if (r > n) {
+    throw new CalculatorError(ERR.DOMAIN_ERROR, 'r must not exceed n');
+  }
+  // Symmetry: C(n, r) = C(n, n-r).
+  const k = Math.min(r, n - r);
+  let result = 1;
+  for (let i = 1; i <= k; i += 1) {
+    result = (result * (n - k + i)) / i;
+  }
+  return guardOverflow(result);
+}
+
+// --- angle conversion --------------------------------------------------------
+
+export function degToRad(deg) {
+  requireFiniteNumber(deg, 'deg');
+  return (deg * PI) / 180;
+}
+
+export function radToDeg(rad) {
+  requireFiniteNumber(rad, 'rad');
+  return (rad * 180) / PI;
+}
+
 // --- trigonometry (radians) --------------------------------------------------
 
 export function sin(x) {
@@ -198,6 +260,70 @@ export function acos(x) {
 export function atan(x) {
   requireFiniteNumber(x, 'x');
   return Math.atan(x);
+}
+
+// --- trigonometry (degrees) --------------------------------------------------
+
+export function sinDeg(deg) {
+  return sin(degToRad(deg));
+}
+
+export function cosDeg(deg) {
+  return cos(degToRad(deg));
+}
+
+export function tanDeg(deg) {
+  return tan(degToRad(deg));
+}
+
+export function asinDeg(x) {
+  return radToDeg(asin(x));
+}
+
+export function acosDeg(x) {
+  return radToDeg(acos(x));
+}
+
+export function atanDeg(x) {
+  return radToDeg(atan(x));
+}
+
+// --- hyperbolic trigonometry -------------------------------------------------
+
+export function sinh(x) {
+  requireFiniteNumber(x, 'x');
+  return guardOverflow(Math.sinh(x));
+}
+
+export function cosh(x) {
+  requireFiniteNumber(x, 'x');
+  return guardOverflow(Math.cosh(x));
+}
+
+export function tanh(x) {
+  requireFiniteNumber(x, 'x');
+  return Math.tanh(x);
+}
+
+export function asinh(x) {
+  requireFiniteNumber(x, 'x');
+  return Math.asinh(x);
+}
+
+export function acosh(x) {
+  requireFiniteNumber(x, 'x');
+  if (x < 1) {
+    throw new CalculatorError(ERR.DOMAIN_ERROR, 'acosh argument must be >= 1');
+  }
+  return Math.acosh(x);
+}
+
+export function atanh(x) {
+  requireFiniteNumber(x, 'x');
+  if (x <= -1 || x >= 1) {
+    throw new CalculatorError(ERR.DOMAIN_ERROR, 'atanh argument must be in (-1, 1)');
+  }
+  return Math.atanh(x);
 }
 
 // --- exponentials and logarithms --------------------------------------------

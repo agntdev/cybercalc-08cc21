@@ -3,13 +3,24 @@ import { describe, expect, it } from 'vitest';
 import {
   abs,
   acos,
+  acosDeg,
+  acosh,
   add,
   asin,
+  asinDeg,
+  asinh,
   atan,
+  atanDeg,
+  atanh,
   CalculatorError,
   cbrt,
+  combinations,
   cos,
+  cosDeg,
+  cosh,
+  degToRad,
   divide,
+  E,
   ERR,
   exp,
   factorial,
@@ -22,14 +33,21 @@ import {
   negate,
   nthRoot,
   percent,
+  permutations,
+  PI,
   power,
+  radToDeg,
+  reciprocal,
   sin,
+  sinDeg,
+  sinh,
   sqrt,
   subtract,
   tan,
+  tanDeg,
+  tanh,
 } from '../src/engine.js';
 
-const PI = Math.PI;
 
 function expectCode(fn, code) {
   try {
@@ -327,6 +345,101 @@ describe('Memory', () => {
     expect(a.recall()).toBe(1);
     expect(b.recall()).toBe(2);
   });
+});
+
+describe('constants', () => {
+  it('PI matches Math.PI', () => expect(PI).toBe(Math.PI));
+  it('E matches Math.E', () => expect(E).toBe(Math.E));
+});
+
+describe('reciprocal', () => {
+  it('reciprocal of 4 is 0.25', () => expect(reciprocal(4)).toBe(0.25));
+  it('reciprocal of -2 is -0.5', () => expect(reciprocal(-2)).toBe(-0.5));
+  it('reciprocal of 1 is 1', () => expect(reciprocal(1)).toBe(1));
+  it('reciprocal of zero throws', () => expectCode(() => reciprocal(0), ERR.DIVISION_BY_ZERO));
+  it('reciprocal throws on NaN', () => expectCode(() => reciprocal(NaN), ERR.INVALID_ARGUMENT));
+});
+
+describe('degToRad / radToDeg', () => {
+  it('degToRad(180) is π', () => expect(degToRad(180)).toBeCloseTo(PI));
+  it('degToRad(0) is 0', () => expect(degToRad(0)).toBe(0));
+  it('degToRad(-90) is -π/2', () => expect(degToRad(-90)).toBeCloseTo(-PI / 2));
+  it('radToDeg(π) is 180', () => expect(radToDeg(PI)).toBeCloseTo(180));
+  it('radToDeg(0) is 0', () => expect(radToDeg(0)).toBe(0));
+  it('round-trip: rad -> deg -> rad', () => expect(degToRad(radToDeg(1.234))).toBeCloseTo(1.234));
+  it('degToRad throws on NaN', () => expectCode(() => degToRad(NaN), ERR.INVALID_ARGUMENT));
+});
+
+describe('trigonometry (degrees)', () => {
+  it('sinDeg(0) is 0', () => expect(sinDeg(0)).toBe(0));
+  it('sinDeg(90) is 1', () => expect(sinDeg(90)).toBeCloseTo(1));
+  it('sinDeg(180) is ~0', () => expect(sinDeg(180)).toBeCloseTo(0));
+  it('sinDeg(-90) is -1', () => expect(sinDeg(-90)).toBeCloseTo(-1));
+
+  it('cosDeg(0) is 1', () => expect(cosDeg(0)).toBe(1));
+  it('cosDeg(90) is ~0', () => expect(cosDeg(90)).toBeCloseTo(0));
+  it('cosDeg(180) is -1', () => expect(cosDeg(180)).toBeCloseTo(-1));
+
+  it('tanDeg(0) is 0', () => expect(tanDeg(0)).toBe(0));
+  it('tanDeg(45) is ~1', () => expect(tanDeg(45)).toBeCloseTo(1));
+
+  it('asinDeg(1) is 90', () => expect(asinDeg(1)).toBeCloseTo(90));
+  it('asinDeg(-1) is -90', () => expect(asinDeg(-1)).toBeCloseTo(-90));
+  it('acosDeg(0) is 90', () => expect(acosDeg(0)).toBeCloseTo(90));
+  it('acosDeg(1) is 0', () => expect(acosDeg(1)).toBeCloseTo(0));
+  it('atanDeg(1) is 45', () => expect(atanDeg(1)).toBeCloseTo(45));
+
+  it('asinDeg throws out of range', () => expectCode(() => asinDeg(2), ERR.DOMAIN_ERROR));
+  it('acosDeg throws out of range', () => expectCode(() => acosDeg(-2), ERR.DOMAIN_ERROR));
+});
+
+describe('hyperbolic trigonometry', () => {
+  it('sinh(0) is 0', () => expect(sinh(0)).toBe(0));
+  it('sinh(1) ≈ 1.1752', () => expect(sinh(1)).toBeCloseTo(1.1752011936));
+  it('sinh(-1) is -sinh(1)', () => expect(sinh(-1)).toBeCloseTo(-1.1752011936));
+  it('sinh throws on overflow', () => expectCode(() => sinh(1000), ERR.OVERFLOW));
+
+  it('cosh(0) is 1', () => expect(cosh(0)).toBe(1));
+  it('cosh(1) ≈ 1.5430', () => expect(cosh(1)).toBeCloseTo(1.5430806348));
+  it('cosh(-1) equals cosh(1)', () => expect(cosh(-1)).toBeCloseTo(cosh(1)));
+  it('cosh throws on overflow', () => expectCode(() => cosh(1000), ERR.OVERFLOW));
+
+  it('tanh(0) is 0', () => expect(tanh(0)).toBe(0));
+  it('tanh(1) ≈ 0.7616', () => expect(tanh(1)).toBeCloseTo(0.7615941559));
+  it('tanh(-1) is -tanh(1)', () => expect(tanh(-1)).toBeCloseTo(-0.7615941559));
+  it('tanh of large input approaches 1', () => expect(tanh(20)).toBeCloseTo(1));
+
+  it('asinh(0) is 0', () => expect(asinh(0)).toBe(0));
+  it('asinh(sinh(2)) is 2', () => expect(asinh(sinh(2))).toBeCloseTo(2));
+
+  it('acosh(1) is 0', () => expect(acosh(1)).toBe(0));
+  it('acosh(cosh(2)) is 2', () => expect(acosh(cosh(2))).toBeCloseTo(2));
+  it('acosh throws below 1', () => expectCode(() => acosh(0.5), ERR.DOMAIN_ERROR));
+
+  it('atanh(0) is 0', () => expect(atanh(0)).toBe(0));
+  it('atanh(0.5) ≈ 0.5493', () => expect(atanh(0.5)).toBeCloseTo(0.5493061443));
+  it('atanh throws at 1', () => expectCode(() => atanh(1), ERR.DOMAIN_ERROR));
+  it('atanh throws at -1', () => expectCode(() => atanh(-1), ERR.DOMAIN_ERROR));
+  it('atanh throws above 1', () => expectCode(() => atanh(2), ERR.DOMAIN_ERROR));
+});
+
+describe('permutations / combinations', () => {
+  it('P(5, 2) is 20', () => expect(permutations(5, 2)).toBe(20));
+  it('P(5, 0) is 1', () => expect(permutations(5, 0)).toBe(1));
+  it('P(5, 5) is 120', () => expect(permutations(5, 5)).toBe(120));
+  it('P(10, 3) is 720', () => expect(permutations(10, 3)).toBe(720));
+  it('P throws when r > n', () => expectCode(() => permutations(3, 5), ERR.DOMAIN_ERROR));
+  it('P throws on negative n', () => expectCode(() => permutations(-1, 0), ERR.DOMAIN_ERROR));
+  it('P throws on non-integer', () => expectCode(() => permutations(5, 1.5), ERR.INVALID_ARGUMENT));
+
+  it('C(5, 2) is 10', () => expect(combinations(5, 2)).toBe(10));
+  it('C(5, 0) is 1', () => expect(combinations(5, 0)).toBe(1));
+  it('C(5, 5) is 1', () => expect(combinations(5, 5)).toBe(1));
+  it('C is symmetric: C(10, 3) = C(10, 7)', () =>
+    expect(combinations(10, 3)).toBe(combinations(10, 7)));
+  it('C(52, 5) is 2598960 (poker hands)', () => expect(combinations(52, 5)).toBe(2598960));
+  it('C throws when r > n', () => expectCode(() => combinations(3, 5), ERR.DOMAIN_ERROR));
+  it('C throws on negative r', () => expectCode(() => combinations(5, -1), ERR.DOMAIN_ERROR));
 });
 
 describe('integration scenarios', () => {
