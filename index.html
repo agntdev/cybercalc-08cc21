@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberCalc</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <div class="calculator">
+
+    <!-- Brand -->
+    <div class="brand">⚡ <span>CyberCalc</span> ⚡</div>
+
+    <!-- Display -->
+    <div class="display-wrap">
+      <div id="expression"></div>
+      <div id="display">0</div>
+    </div>
+
+    <!-- Settings Toggle -->
+    <button class="settings-toggle" id="settingsToggle" title="Sound Settings">⚙</button>
+
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settingsPanel">
+      <h3>Sound Settings</h3>
+
+      <!-- Master -->
+      <div class="setting-row"><label>Master Volume</label></div>
+      <input type="range" class="volume-slider" id="volMaster" min="0" max="1" step="0.05" data-type="master">
+
+      <!-- Click -->
+      <div class="setting-row">
+        <label>Keypad Clicks</label>
+        <div class="toggle on" id="toggleClick" data-sound="click"></div>
+      </div>
+      <input type="range" class="volume-slider sub" id="volClick" min="0" max="1" step="0.05" data-type="click">
+
+      <!-- Error -->
+      <div class="setting-row">
+        <label>Error Alerts</label>
+        <div class="toggle on" id="toggleError" data-sound="error"></div>
+      </div>
+      <input type="range" class="volume-slider sub" id="volError" min="0" max="1" step="0.05" data-type="error">
+
+      <!-- Ambient -->
+      <div class="setting-row">
+        <label>
+          Ambient Music
+          <span class="status-ambient" id="ambientStatus"></span>
+        </label>
+        <div class="toggle" id="toggleAmbient" data-sound="ambient"></div>
+      </div>
+      <input type="range" class="volume-slider sub" id="volAmbient" min="0" max="1" step="0.05" data-type="ambient">
+
+      <div style="margin-top:10px;text-align:center;font-size:11px;color:#6666aa">
+        settings persist automatically
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="buttons" id="buttons">
+      <button class="btn clear" data-key="C">C</button>
+      <button class="btn fn" data-key="⌫">⌫</button>
+      <button class="btn fn" data-key="%">%</button>
+      <button class="btn op" data-key="÷">÷</button>
+
+      <button class="btn" data-key="7">7</button>
+      <button class="btn" data-key="8">8</button>
+      <button class="btn" data-key="9">9</button>
+      <button class="btn op" data-key="×">×</button>
+
+      <button class="btn" data-key="4">4</button>
+      <button class="btn" data-key="5">5</button>
+      <button class="btn" data-key="6">6</button>
+      <button class="btn op" data-key="−">−</button>
+
+      <button class="btn" data-key="1">1</button>
+      <button class="btn" data-key="2">2</button>
+      <button class="btn" data-key="3">3</button>
+      <button class="btn op" data-key="+">+</button>
+
+      <button class="btn fn" data-key="±">±</button>
+      <button class="btn" data-key="0">0</button>
+      <button class="btn" data-key=".">.</button>
+      <button class="btn eq" data-key="=">=</button>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <a href="https://agnt-gm.ai/projects/cybercalc-08cc21" target="_blank">$CBPCK</a>
+      &nbsp;·&nbsp; agnt-gm.ai
+    </div>
+  </div>
+
+  <script src="js/sound.js"></script>
+  <script src="js/calculator.js"></script>
+  <script>
+  /* ── Settings panel wiring ───────────────────────────── */
+  const panel = document.getElementById('settingsPanel');
+  const toggleBtn = document.getElementById('settingsToggle');
+
+  toggleBtn.addEventListener('click', () => {
+    panel.classList.toggle('open');
+  });
+
+  // Close panel on click outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.settings-panel') && !e.target.closest('.settings-toggle')) {
+      panel.classList.remove('open');
+    }
+  });
+
+  /* ── Restore saved state ─────────────────────────────── */
+  function restoreUI() {
+    // Toggles
+    ;['click','error','ambient'].forEach(type => {
+      const el = document.querySelector(`.toggle[data-sound="${type}"]`);
+      if (sound.isEnabled(type)) el.classList.add('on');
+      else el.classList.remove('on');
+    });
+
+    // Volume sliders
+    ;['master','click','error','ambient'].forEach(type => {
+      const el = document.getElementById(`vol${type.charAt(0).toUpperCase()+type.slice(1)}`);
+      if (el) el.value = sound.getVolume(type);
+    });
+
+    // Ambient status dot
+    if (sound.isEnabled('ambient')) {
+      document.getElementById('ambientStatus').classList.add('on');
+    }
+  }
+
+  /* ── Toggle switches ────────────────────────────────── */
+  document.querySelectorAll('.toggle[data-sound]').forEach(el => {
+    el.addEventListener('click', () => {
+      const type = el.dataset.sound;
+      const isOn = el.classList.toggle('on');
+      sound.toggleSound(type, isOn);
+
+      if (type === 'ambient') {
+        const statusDot = document.getElementById('ambientStatus');
+        if (isOn) {
+          sound.startAmbient();
+          statusDot.classList.add('on');
+        } else {
+          sound.stopAmbient();
+          statusDot.classList.remove('on');
+        }
+      }
+    });
+  });
+
+  /* ── Volume sliders ──────────────────────────────────── */
+  document.querySelectorAll('.volume-slider').forEach(el => {
+    el.addEventListener('input', () => {
+      const type = el.dataset.type;
+      sound.setVolume(type, parseFloat(el.value));
+    });
+  });
+
+  /* ── Init from saved state ──────────────────────────── */
+  restoreUI();
+
+  /* ── Negate button wiring ────────────────────────────── */
+  document.querySelector('[data-key="±"]').addEventListener('click', () => {
+    calc.inputNegate();
+  });
+
+  /* ── Click handlers for all calc buttons ─────────────── */
+  document.getElementById('buttons').addEventListener('click', (e) => {
+    const btn = e.target.closest('.btn');
+    if (!btn) return;
+    const key = btn.dataset.key;
+
+    if (key >= '0' && key <= '9') calc.inputDigit(key);
+    else if ('+-×÷'.includes(key)) calc.inputOperator(key);
+    else if (key === '=') calc.inputEquals();
+    else if (key === 'C') calc.inputClear();
+    else if (key === '⌫') calc.inputBackspace();
+    else if (key === '%') calc.inputPercent();
+    else if (key === '.') calc.inputDecimal();
+  });
+  </script>
+</body>
+</html>
