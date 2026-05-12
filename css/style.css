@@ -487,6 +487,25 @@ body.glitching .calculator::after {
   max-width: 126px;
 }
 
+.community-row {
+  align-items: flex-start;
+  margin-top: 4px;
+}
+
+.community-status {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-dim);
+  font-size: 10px;
+  max-width: 126px;
+}
+
+.community-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .ar-hologram {
   position: fixed;
   left: 50%;
