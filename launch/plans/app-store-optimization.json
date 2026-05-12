@@ -1,0 +1,25 @@
+{
+  "appName": "CyberCalc",
+  "subtitle": "Neon math, sync, AR, and challenges",
+  "keywords": [
+    "calculator",
+    "cyberpunk",
+    "neon",
+    "math",
+    "sync",
+    "AR",
+    "productivity",
+    "community"
+  ],
+  "screenshots": [
+    "calculator-keypad",
+    "sync-settings",
+    "ar-fallback",
+    "community-challenge"
+  ],
+  "conversionHypotheses": [
+    "Lead with neon calculator visual instead of feature list",
+    "Mention local-first sync to answer privacy concerns",
+    "Show AR fallback as a differentiator without requiring AR hardware"
+  ]
+}
