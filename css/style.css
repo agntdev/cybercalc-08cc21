@@ -17,16 +17,41 @@
   --glow-magenta: 0 0 8px var(--magenta), 0 0 20px rgba(255, 0, 170, 0.3);
   --radius: 10px;
   --font: 'Courier New', 'JetBrains Mono', monospace;
+  --pointer-x: 50vw;
+  --pointer-y: 50vh;
+  --glow-cyan-size: 19px;
+  --glow-magenta-size: 48px;
+  --glitch-x: 0px;
+  --glitch-y: 0px;
+  --glitch-skew: 0deg;
+  --glitch-opacity: 0.7;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body {
   height: 100%;
-  background: var(--bg);
+  background:
+    radial-gradient(circle at var(--pointer-x) var(--pointer-y), rgba(0, 240, 255, 0.12), transparent 26rem),
+    radial-gradient(circle at 20% 15%, rgba(255, 0, 170, 0.1), transparent 22rem),
+    var(--bg);
   color: var(--text);
   font-family: var(--font);
   overflow: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    linear-gradient(90deg, rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(rgba(255, 0, 170, 0.035) 1px, transparent 1px);
+  background-size: 42px 42px;
+  mask-image: radial-gradient(circle at center, #000 0 55%, transparent 82%);
+  pointer-events: none;
+  z-index: 0;
+  animation: grid-drift 18s linear infinite;
 }
 
 /* ── CRT scanline overlay ────────────────────────────── */
@@ -45,6 +70,42 @@ body::after {
   z-index: 100;
 }
 
+.circuit-layer,
+.cyber-3d {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.circuit-layer {
+  z-index: 1;
+  opacity: 0.55;
+}
+
+.circuit-trace {
+  position: absolute;
+  background: linear-gradient(90deg, transparent, rgba(0, 240, 255, 0.65), transparent);
+  box-shadow: 0 0 10px rgba(0, 240, 255, 0.45);
+  animation: trace-pulse 3.2s ease-in-out infinite;
+}
+
+.circuit-trace.v {
+  background: linear-gradient(180deg, transparent, rgba(255, 0, 170, 0.55), transparent);
+  box-shadow: 0 0 10px rgba(255, 0, 170, 0.35);
+}
+
+.cyber-3d {
+  z-index: 2;
+  opacity: 0.48;
+  filter: drop-shadow(0 0 16px rgba(0, 240, 255, 0.35));
+}
+
+.cyber-3d-fallback {
+  background:
+    radial-gradient(circle at 74% 24%, rgba(0, 240, 255, 0.16), transparent 8rem),
+    radial-gradient(circle at 28% 78%, rgba(255, 0, 170, 0.12), transparent 10rem);
+}
+
 /* ── Layout ──────────────────────────────────────────── */
 .calculator {
   position: absolute;
@@ -55,7 +116,37 @@ body::after {
   border: 1px solid var(--cyan);
   border-radius: var(--radius);
   padding: 20px;
-  box-shadow: var(--glow-cyan), inset 0 0 60px rgba(0, 240, 255, 0.03);
+  z-index: 10;
+  box-shadow:
+    0 0 var(--glow-cyan-size) rgba(0, 240, 255, 0.55),
+    0 0 var(--glow-magenta-size) rgba(255, 0, 170, 0.18),
+    inset 0 0 60px rgba(0, 240, 255, 0.03);
+  transition: box-shadow 0.14s ease;
+}
+
+body.glitching .calculator {
+  animation: calculator-glitch 180ms steps(2, end);
+}
+
+body.glitching .calculator::before,
+body.glitching .calculator::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: var(--radius);
+  pointer-events: none;
+  opacity: var(--glitch-opacity);
+  mix-blend-mode: screen;
+}
+
+body.glitching .calculator::before {
+  border: 1px solid var(--magenta);
+  transform: translate(var(--glitch-x), 0) skewX(var(--glitch-skew));
+}
+
+body.glitching .calculator::after {
+  border: 1px solid var(--cyan);
+  transform: translate(calc(var(--glitch-x) * -1), var(--glitch-y)) skewX(calc(var(--glitch-skew) * -1));
 }
 
 /* ── Brand ───────────────────────────────────────────── */
@@ -142,6 +233,7 @@ body::after {
 .btn:hover {
   background: #222244;
   border-color: rgba(0, 240, 255, 0.2);
+  filter: brightness(1.12);
 }
 
 .btn:active,
@@ -346,4 +438,33 @@ body::after {
 }
 .footer a:hover {
   text-shadow: 0 0 6px var(--magenta);
+}
+
+@keyframes grid-drift {
+  from { background-position: 0 0, 0 0; }
+  to { background-position: 84px 42px, -42px 84px; }
+}
+
+@keyframes trace-pulse {
+  0%, 100% { opacity: 0.2; transform: scaleX(0.82); }
+  50% { opacity: 0.9; transform: scaleX(1); }
+}
+
+@keyframes calculator-glitch {
+  0% { transform: translate(-50%, -50%); }
+  35% { transform: translate(calc(-50% + var(--glitch-x)), calc(-50% + var(--glitch-y))) skewX(var(--glitch-skew)); }
+  70% { transform: translate(calc(-50% - var(--glitch-x)), calc(-50% - var(--glitch-y))) skewX(calc(var(--glitch-skew) * -1)); }
+  100% { transform: translate(-50%, -50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before,
+  .circuit-trace,
+  body.glitching .calculator {
+    animation: none;
+  }
+
+  .cyber-3d {
+    display: none;
+  }
 }
