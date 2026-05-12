@@ -72,7 +72,11 @@ class Calculator {
   inputEquals() {
     if (!this.operation) return;
     if (this.shouldReset) return; // prevent double-eval
+    const expression = `${this.previous} ${this.operation} ${this.current}`;
     this._compute();
+    if (this.current !== 'Error') {
+      this._emitCalculation(expression, this.current);
+    }
     this.operation = null;
     this.previous = null;
     this.shouldReset = true;
@@ -176,6 +180,16 @@ class Calculator {
       btn.classList.add('active');
       setTimeout(() => btn.classList.remove('active'), 100);
     }
+  }
+
+  _emitCalculation(expression, result) {
+    window.dispatchEvent(new CustomEvent('cybercalc:calculation', {
+      detail: {
+        expression,
+        result,
+        createdAt: new Date().toISOString(),
+      },
+    }));
   }
 }
 
