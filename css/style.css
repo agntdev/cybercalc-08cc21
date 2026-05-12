@@ -475,6 +475,18 @@ body.glitching .calculator::after {
   font-size: 10px;
 }
 
+.beta-row {
+  margin-top: 4px;
+}
+
+.beta-status {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-dim);
+  font-size: 10px;
+  max-width: 126px;
+}
+
 .ar-hologram {
   position: fixed;
   left: 50%;
