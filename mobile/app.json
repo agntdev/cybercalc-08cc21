@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "CyberCalc",
+    "slug": "cybercalc",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "cybercalc",
+    "userInterfaceStyle": "dark",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "ai.agnt.cybercalc",
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"]
+      }
+    },
+    "android": {
+      "package": "ai.agnt.cybercalc",
+      "adaptiveIcon": {
+        "backgroundColor": "#0a0a0f"
+      },
+      "permissions": ["POST_NOTIFICATIONS"]
+    },
+    "plugins": [
+      "expo-notifications"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "cybercalc-local-framework"
+      }
+    }
+  }
+}
