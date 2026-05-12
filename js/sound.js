@@ -53,6 +53,11 @@ class SoundEngine {
         enabled: this.enabled,
         volume: this.volume,
       }));
+      window.dispatchEvent(new CustomEvent('cybercalc:preferences-changed', {
+        detail: {
+          soundEnabled: Object.values(this.enabled).some(Boolean),
+        },
+      }));
     } catch { /* quota exceeded, ignore silently */ }
   }
 

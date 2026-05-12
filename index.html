@@ -54,6 +54,15 @@
       </div>
       <input type="range" class="volume-slider sub" id="volAmbient" min="0" max="1" step="0.05" data-type="ambient">
 
+      <!-- Sync -->
+      <div class="setting-row sync-row">
+        <label>
+          Cloud Sync
+          <span class="sync-status" id="syncStatus">starting</span>
+        </label>
+        <button class="sync-button" id="syncNow" type="button">sync</button>
+      </div>
+
       <div style="margin-top:10px;text-align:center;font-size:11px;color:#6666aa">
         settings persist automatically
       </div>
@@ -96,6 +105,7 @@
 
   <script src="js/sound.js"></script>
   <script type="module" src="js/effects.js"></script>
+  <script type="module" src="js/sync.js"></script>
   <script src="js/calculator.js"></script>
   <script>
   /* ── Settings panel wiring ───────────────────────────── */
