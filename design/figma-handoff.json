@@ -1,0 +1,56 @@
+{
+  "figmaHandoffVersion": "1.0.0",
+  "fileName": "CyberCalc Neon UI Kit",
+  "pages": [
+    {
+      "name": "Foundations",
+      "frames": [
+        {
+          "name": "Color Tokens",
+          "components": ["background", "panel", "surface", "cyan", "magenta", "yellow", "green", "text"]
+        },
+        {
+          "name": "Typography Tokens",
+          "components": ["brand label", "display value", "button label", "settings label", "footer"]
+        }
+      ]
+    },
+    {
+      "name": "Components",
+      "frames": [
+        {
+          "name": "Calculator Shell",
+          "components": ["brand", "display", "keypad", "settings panel", "sync status", "AR fallback"]
+        },
+        {
+          "name": "Button States",
+          "components": ["number", "operator", "function", "equals", "clear", "active", "hover", "disabled"]
+        },
+        {
+          "name": "Icon Set",
+          "components": ["calc", "sync", "ar", "glitch", "community"]
+        }
+      ]
+    },
+    {
+      "name": "Motion",
+      "frames": [
+        {
+          "name": "Glitch Burst",
+          "durationMs": 180,
+          "states": ["idle", "offset magenta", "offset cyan", "settled"]
+        },
+        {
+          "name": "Circuit Trace",
+          "durationMs": 3200,
+          "states": ["dim", "pulse", "fade"]
+        },
+        {
+          "name": "AR Hologram",
+          "durationMs": 420,
+          "states": ["hidden", "rise", "interactive tilt"]
+        }
+      ]
+    }
+  ]
+}
