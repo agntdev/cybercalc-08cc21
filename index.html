@@ -63,6 +63,15 @@
         <button class="sync-button" id="syncNow" type="button">sync</button>
       </div>
 
+      <!-- AR -->
+      <div class="setting-row ar-row">
+        <label>
+          AR Mode
+          <span class="ar-status" id="arStatus">checking</span>
+        </label>
+        <button class="sync-button" id="arToggle" type="button">AR</button>
+      </div>
+
       <div style="margin-top:10px;text-align:center;font-size:11px;color:#6666aa">
         settings persist automatically
       </div>
@@ -106,6 +115,7 @@
   <script src="js/sound.js"></script>
   <script type="module" src="js/effects.js"></script>
   <script type="module" src="js/sync.js"></script>
+  <script type="module" src="js/ar.js"></script>
   <script src="js/calculator.js"></script>
   <script>
   /* ── Settings panel wiring ───────────────────────────── */

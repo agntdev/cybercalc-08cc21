@@ -25,6 +25,9 @@
   --glitch-y: 0px;
   --glitch-skew: 0deg;
   --glitch-opacity: 0.7;
+  --ar-rotate-x: 0deg;
+  --ar-rotate-y: 0deg;
+  --ar-scale: 1;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -461,9 +464,90 @@ body.glitching .calculator::after {
   box-shadow: var(--glow-cyan);
 }
 
+.ar-row {
+  margin-top: 4px;
+}
+
+.ar-status {
+  display: block;
+  margin-top: 4px;
+  color: var(--text-dim);
+  font-size: 10px;
+}
+
+.ar-hologram {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: min(76vw, 360px);
+  min-height: 150px;
+  padding: 22px;
+  border: 1px solid rgba(0, 240, 255, 0.6);
+  border-radius: 12px;
+  background:
+    linear-gradient(135deg, rgba(0, 240, 255, 0.14), rgba(255, 0, 170, 0.08)),
+    rgba(5, 5, 16, 0.72);
+  box-shadow: 0 0 36px rgba(0, 240, 255, 0.38), inset 0 0 28px rgba(255, 0, 170, 0.12);
+  color: var(--cyan);
+  display: none;
+  pointer-events: auto;
+  text-align: center;
+  transform:
+    translate(-50%, -50%)
+    perspective(720px)
+    rotateX(var(--ar-rotate-x))
+    rotateY(var(--ar-rotate-y))
+    scale(var(--ar-scale));
+  transform-style: preserve-3d;
+  transition: transform 0.12s ease, opacity 0.16s ease;
+  z-index: 20;
+}
+
+body.ar-mode .ar-hologram {
+  display: block;
+  animation: hologram-rise 420ms ease-out both;
+}
+
+.ar-hologram-label,
+.ar-hologram-hint {
+  color: var(--text-dim);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.ar-hologram-value {
+  margin: 18px 0 14px;
+  font-size: 42px;
+  font-weight: 700;
+  text-shadow: var(--glow-cyan);
+  word-break: break-all;
+}
+
+.ar-hologram[data-gesture="swipe-left"],
+.ar-hologram[data-gesture="swipe-right"] {
+  border-color: var(--magenta);
+  box-shadow: var(--glow-magenta);
+}
+
+body.ar-mode .calculator {
+  opacity: 0.38;
+  filter: blur(1px);
+}
+
 @keyframes pulse-dot {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
+}
+
+@keyframes hologram-rise {
+  from {
+    opacity: 0;
+    transform: translate(-50%, calc(-50% + 32px)) perspective(720px) rotateX(20deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ── Footer ──────────────────────────────────────────── */
@@ -508,5 +592,9 @@ body.glitching .calculator::after {
 
   .cyber-3d {
     display: none;
+  }
+
+  .ar-hologram {
+    transition: none;
   }
 }
